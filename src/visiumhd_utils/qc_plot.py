@@ -27,6 +27,8 @@ def compute_qc_metrics(sdata, mito_prefix="MT-"):
     Modified SpatialData object with updated QC metrics.
     """
     adata = sdata.tables["square_002um"]
+    # Add boolean column (to identify MT genes) to var
+    adata.var["mt"] = adata.var_names.str.startswith(mito_prefix)
 
     # Calculate QC metrics using scanpy
     sc.pp.calculate_qc_metrics(
