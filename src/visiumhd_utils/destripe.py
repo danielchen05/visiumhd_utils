@@ -6,7 +6,7 @@ Some functions are taken from bin2cell package.
 """
 import bin2cell as b2c
 
-def destripe_b2c(sdata, quantile = 0.99, only2um=):
+def destripe_b2c(sdata, quantile = 0.99, only2um=True):
     """
     function to destripe VisiumHD data. primarily taken from bin2cell package
     Note: bin2cell works on AnnData objects, which need to be extracted from spatialdata object
