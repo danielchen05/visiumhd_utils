@@ -45,7 +45,7 @@ def compute_qc_metrics(sdata, mito_prefix="MT-"):
     return sdata
 
 
-def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None):
+def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None, save_path=None):
     """
     Plot a single QC metric (e.g., total counts, % mito) at 2um resolution.
 
@@ -57,6 +57,7 @@ def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None):
     cmap: matplotlib colormap name (default: "viridis")
     vmin: (optional) lower limit for color scale
     vmax: (optional) upper limit for color scale
+    save_path: (optional) the path to save figure. If None (default), shows plot interactively.
     """
     from spatialdata_plot.pl.utils import set_zero_in_cmap_to_transparent
 
@@ -80,9 +81,9 @@ def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None):
     ).pl.show(
         coordinate_systems="global",
         title=f"2um QC: {metric}",
-        figsize=(10, 10)
+        figsize=(10, 10),
+        save=save_path
     )
-
 
 def plot_gene_exp(sdata, id, gene_name):
     """
