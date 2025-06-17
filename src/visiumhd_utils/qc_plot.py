@@ -7,7 +7,7 @@ import spatialdata_plot # used for rendering images method
 import numpy as np
 import scanpy as sc
 
-def compute_qc_metrics(sdata, mito_prefix="MT-"):
+def compute_qc_metrics(sdata, bin_size = 2, mito_prefix="MT-"):
     """
     Compute standard QC metrics using Scanpy and add log-transformed total counts.
     Coupled with plot_qc_metrics below
@@ -20,20 +20,25 @@ def compute_qc_metrics(sdata, mito_prefix="MT-"):
     - 'log_total_counts': log1p of total counts
 
     Args:
-    sdata: the SpatialData object
+    sdata: the SpatialData 
+    bin_size: bin resolution in um (must be from 2,8,16). default to 2um
     mito_prefix: prefix used to identify mitochondrial genes (default is "MT-")
 
     Return:
     Modified SpatialData object with updated QC metrics.
     """
-    adata = sdata.tables["square_002um"]
+    if bin_size not in [2, 8, 16]:
+        raise ValueError("bin_size must be one of: 2, 8, 16") # double check bin size
+    bin_str = f"{bin_size:03d}um" # padding
+    table_key = f"square_{bin_str}"
+    adata = sdata.tables[table_key]
     # Add boolean column (to identify MT genes) to var
     adata.var["mt"] = adata.var_names.str.startswith(mito_prefix)
 
     # Calculate QC metrics using scanpy
     sc.pp.calculate_qc_metrics(
         adata,
-        qc_vars={"mt": adata.var_names.str.startswith(mito_prefix)},
+        qc_vars={"mt": adata.var["mt"]},
         percent_top=None,
         log1p=False,
         inplace=True
@@ -45,7 +50,7 @@ def compute_qc_metrics(sdata, mito_prefix="MT-"):
     return sdata
 
 
-def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None, save_path=None):
+def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vmax=None, save_path=None):
     """
     Plot a single QC metric (e.g., total counts, % mito) at 2um resolution.
 
@@ -54,6 +59,7 @@ def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None, sav
     id: ID of the VisiumHD dataset (ex. "H1-TRH234F_D1")
     metric: name of the QC metric in sdata.tables["square_002um"].obs to visualize.
             Examples: "total_counts", "log_total_counts", "n_genes_by_counts", "pct_counts_mt" from compute function
+    bin_size: bin resolution in um (must be from 2,8,16). default to 2um
     cmap: matplotlib colormap name (default: "viridis")
     vmin: (optional) lower limit for color scale
     vmax: (optional) upper limit for color scale
@@ -61,12 +67,17 @@ def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None, sav
     """
     from spatialdata_plot.pl.utils import set_zero_in_cmap_to_transparent
 
-    bin_key = f"{id}_square_002um"
-    adata = sdata.tables["square_002um"]
+    if bin_size not in [2, 8, 16]:
+        raise ValueError("bin_size must be one of: 2, 8, 16")
+
+    bin_str = f"{bin_size:03d}um"
+    table_key = f"square_{bin_str}"
+    bin_key = f"{id}_{table_key}"
+    adata = sdata.tables[table_key]
 
     # Validate metric exists
     if metric not in adata.obs.columns:
-        raise ValueError(f"Metric '{metric}' not found in sdata.tables['square_002um'].obs")
+        raise ValueError(f"Metric '{metric}' not found in sdata.tables['{table_key}'].obs")
 
     # Make zero-transparent colormap for sparse data
     custom_cmap = set_zero_in_cmap_to_transparent(cmap=cmap)
@@ -80,7 +91,7 @@ def plot_qc_metrics(sdata, id, metric, cmap="viridis", vmin=None, vmax=None, sav
         vmax=vmax
     ).pl.show(
         coordinate_systems="global",
-        title=f"2um QC: {metric}",
+        title=f"{bin_size}um QC: {metric}",
         figsize=(10, 10),
         save=save_path
     )
