@@ -88,7 +88,9 @@ def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vm
         color=metric,
         cmap=custom_cmap,
         vmin=vmin,
-        vmax=vmax
+        vmax=vmax,
+        method = "datashader",
+        datashader_reduction = "max" # to preserve max of the data for colorscale
     ).pl.show(
         coordinate_systems="global",
         title=f"{bin_size}um QC: {metric}",
