@@ -29,7 +29,7 @@ def write_2um_filtered_counts(sdata, raw_folder_path):
 
     # Load and validate barcode/gene information
     old_barcodes = pd.read_csv(barcodes_path, sep="\t", header=None).iloc[:, 0]
-    old_genes = pd.read_csv(features_path, sep="\t", header=None).iloc[:, 0]
+    old_genes = pd.read_csv(features_path, sep="\t", header=None).iloc[:, 1]
 
     assert (adata.obs_names == old_barcodes.values).all(), "Barcodes do not match!"
     assert (adata.var_names == old_genes.values).all(), "Gene names do not match!"
