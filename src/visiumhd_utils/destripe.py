@@ -28,7 +28,7 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
     Return:
     sdata: the resulting spatialdata object
     """
-    def destripe(adata, quantile=0.99, counts_key="total_counts", factor_key="destripe_factor",
+    def destripe(adata, quantile=0.99, counts_key="n_counts", factor_key="destripe_factor",
                  adjusted_counts_key="n_counts_adjusted", adjust_counts=True):
         """
         Perform destriping calculations.
@@ -57,7 +57,7 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
         if adjust_counts:
             destripe_counts(adata, counts_key, adjusted_counts_key)
     
-    def destripe_counts(adata, counts_key="total_counts", adjusted_counts_key="n_counts_adjusted"):
+    def destripe_counts(adata, counts_key="n_counts", adjusted_counts_key="n_counts_adjusted"):
         """
         Scale each row (bin) of adata.X to have adjusted total counts.
         Args:
@@ -79,6 +79,7 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
         if key not in sdata.tables: # double check if key is present
             raise KeyError(f"{key} not found in sdata.tables")
         adata = sdata.tables[key]
+        adata.obs["n_counts"] = np.array(adata.X.sum(axis=1)).flatten() # compute n_counts
         destripe(adata, quantile=quantile)
         sdata.tables[key] = adata  # update modified table back
 
