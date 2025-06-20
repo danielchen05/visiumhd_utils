@@ -22,10 +22,9 @@
     .. image:: https://img.shields.io/twitter/url/http/shields.io.svg?style=social&label=Twitter
         :alt: Twitter
         :target: https://twitter.com/visiumhd_utils
-
-.. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
-    :alt: Project generated with PyScaffold
-    :target: https://pyscaffold.org/
+    .. image:: https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold
+        :alt: Project generated with PyScaffold
+        :target: https://pyscaffold.org/
 
 |
 
@@ -34,7 +33,7 @@ visiumhd_utils
 ==============
 
 
-    Tools for analyzing and visualizing Visium HD spatial transcriptomics data.
+    Tools for pre-processing and visualizing Visium HD spatial transcriptomics data.
 
 
 Features
@@ -60,10 +59,15 @@ Usage
 
     import visiumhd_utils.read_data as rd 
     import visiumhd_utils.qc_plot as qp
+    import visiumhd_utils.destripe as ds
+    import visiumhd_utils.write_data as wd
 
     sdata = rd.to_spatialdata("path/to/data", "id")
     qp.compute_qc_metrics(sdata)
-    qp.plot_qc_metrics(sdata, metric="pct_counts_mt")
+    qp.plot_qc_metrics(sdata, "id", metric="pct_counts_mt")
+    ds.destripe_b2c(sdata)
+    wd.write_2um_filtered_counts(sdata, "path/to/folder")
+
 
 Project Status
 --------------
