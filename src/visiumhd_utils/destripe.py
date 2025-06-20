@@ -28,7 +28,7 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
     Return:
     sdata: the resulting spatialdata object
     """
-    def destripe(adata, quantile=0.99, counts_key="n_counts", factor_key="destripe_factor",
+    def destripe(adata, quantile=0.99, counts_key="total_counts", factor_key="destripe_factor",
                  adjusted_counts_key="n_counts_adjusted", adjust_counts=True):
         """
         Perform destriping calculations.
@@ -40,6 +40,10 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
         adjusted_counts_key: name of column for storing destriped counts per bin (default = n_counts_adjusted)
         adjust_counts: boolean, whether to use computed adjusted count total to adjust counts in adata.X (default = True)
         """
+        # validity check
+        if counts_key not in adata.obs:
+            raise KeyError(f"'{counts_key}' not found in adata.obs. Available columns: {adata.obs.columns.tolist()}")
+        
         # Row-wise normalization
         row_q = adata.obs.groupby("array_row")[counts_key].quantile(quantile) # get quantile per row
         adata.obs[factor_key] = adata.obs[counts_key] / adata.obs["array_row"].map(row_q) # divide by quantile
@@ -53,7 +57,7 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
         if adjust_counts:
             destripe_counts(adata, counts_key, adjusted_counts_key)
     
-    def destripe_counts(adata, counts_key="n_counts", adjusted_counts_key="n_counts_adjusted"):
+    def destripe_counts(adata, counts_key="total_counts", adjusted_counts_key="n_counts_adjusted"):
         """
         Scale each row (bin) of adata.X to have adjusted total counts.
         Args:
