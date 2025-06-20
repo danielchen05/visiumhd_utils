@@ -34,10 +34,42 @@ visiumhd_utils
 ==============
 
 
-    Add a short description here!
+    Tools for analyzing and visualizing Visium HD spatial transcriptomics data.
 
 
-A longer description of your project goes here...
+Features
+--------
+- Read in raw VisiumHD data and convert to SpatialData objects
+- Quality control metric plotting and image plotting
+- Destripe counts from raw 2um bins
+- Write updated counts back to raw VisiumHD data format
+
+Installation
+------------
+
+Install from PyPI:
+
+.. code-block:: bash
+
+    pip install visiumhd-utils
+
+Usage
+-----
+
+.. code-block:: python
+
+    import visiumhd_utils.read_data as rd 
+    import visiumhd_utils.qc_plot as qp
+
+    sdata = rd.to_spatialdata("path/to/data", "id")
+    qp.compute_qc_metrics(sdata)
+    qp.plot_qc_metrics(sdata, metric="pct_counts_mt")
+
+Project Status
+--------------
+
+This package is in early development. Use with caution; interfaces may change. 
+Tests haven't been implemented and will be added in a future version.
 
 
 .. _pyscaffold-notes:
