@@ -6,8 +6,8 @@ Some functions are incorporated from bin2cell package.
 """
 import numpy as np
 import scanpy as sc
-import scipy
-def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
+
+def destripe_b2c(sdata, quantile = 0.99, only_2um=True, plot=False):
     """
     function to destripe VisiumHD data using the method provided by bin2cell package.
     Note: bin2cell works on AnnData objects, which need to be extracted from spatialdata object.
@@ -47,9 +47,17 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
         # Row-wise normalization
         row_q = adata.obs.groupby("array_row")[counts_key].quantile(quantile) # get quantile per row
         adata.obs[factor_key] = adata.obs[counts_key] / adata.obs["array_row"].map(row_q) # divide by quantile
+        # clean-up bad values
+        adata.obs[factor_key].replace([np.inf, -np.inf], np.nan, inplace=True)
+        adata.obs[factor_key].fillna(1.0, inplace=True)
+
         # Column-wise normalization
         col_q = adata.obs.groupby("array_col")[factor_key].quantile(quantile)
         adata.obs[factor_key] /= adata.obs["array_col"].map(col_q)
+        # clean-up bad values
+        adata.obs[factor_key].replace([np.inf, -np.inf], np.nan, inplace=True)
+        adata.obs[factor_key].fillna(1.0, inplace=True)
+        
         # Global adjustment (global quantile * destripe factor)
         global_q = np.quantile(adata.obs[counts_key], quantile)
         adata.obs[adjusted_counts_key] = adata.obs[factor_key] * global_q
@@ -69,12 +77,11 @@ def destripe_b2c(sdata, quantile = 0.99, only2um=True, plot=False):
         #if it is a view then weird stuff happens when you try to write to its .X
         sc._utils.view_to_actual(adata)
         # adjust count matrix
-        scaling_factors = adata.obs[adjusted_counts_key] / adata.obs[counts_key]
-        scaling_factors = scaling_factors.replace([np.inf, -np.inf], np.nan).fillna(1.0) # handle bad values (NaN, inf, -inf), define scaling factor = 1
-        scaling_diag = scipy.sparse.diags(scaling_factors.values)
-        adata.X = scaling_diag.dot(adata.X)
+        scaling_factors = (adata.obs[adjusted_counts_key] / adata.obs[counts_key]).replace([np.inf, -np.inf], np.nan).fillna(1.0) # handle bad values (NaN, inf, -inf), define scaling factor = 1
+        adata.X = adata.X.multiply(scaling_factors.values[:, None]) # matrix multiplication, edited for efficiency
+        adata.obs[counts_key] = np.array(adata.X.sum(axis=1)).flatten() # edit n_counts based on destriped counts
 
-    if only2um: # only handling 2um
+    if only_2um: # only handling 2um
         key = "square_002um"
         if key not in sdata.tables: # double check if key is present
             raise KeyError(f"{key} not found in sdata.tables")
