@@ -48,15 +48,15 @@ def destripe_b2c(sdata, quantile = 0.99, only_2um=True, plot=False):
         row_q = adata.obs.groupby("array_row")[counts_key].quantile(quantile) # get quantile per row
         adata.obs[factor_key] = adata.obs[counts_key] / adata.obs["array_row"].map(row_q) # divide by quantile
         # clean-up bad values
-        adata.obs[factor_key].replace([np.inf, -np.inf], np.nan, inplace=True)
-        adata.obs[factor_key].fillna(1.0, inplace=True)
+        adata.obs[factor_key] = adata.obs[factor_key].replace([np.inf, -np.inf], np.nan)
+        adata.obs[factor_key] = adata.obs[factor_key].fillna(1.0)
 
         # Column-wise normalization
         col_q = adata.obs.groupby("array_col")[factor_key].quantile(quantile)
         adata.obs[factor_key] /= adata.obs["array_col"].map(col_q)
         # clean-up bad values
-        adata.obs[factor_key].replace([np.inf, -np.inf], np.nan, inplace=True)
-        adata.obs[factor_key].fillna(1.0, inplace=True)
+        adata.obs[factor_key] = adata.obs[factor_key].replace([np.inf, -np.inf], np.nan)
+        adata.obs[factor_key] = adata.obs[factor_key].fillna(1.0)
         
         # Global adjustment (global quantile * destripe factor)
         global_q = np.quantile(adata.obs[counts_key], quantile)
