@@ -71,7 +71,6 @@ Project Status
 --------------
 
 This package is in early development. Use with caution; interfaces may change. 
-Tests haven't been implemented and will be added in a future version.
 
 
 .. _pyscaffold-notes:
