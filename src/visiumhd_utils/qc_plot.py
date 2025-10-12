@@ -99,7 +99,7 @@ def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vm
         save=save_path
     )
 
-def plot_gene_exp(sdata, id, gene_name):
+def plot_gene_exp(sdata, id, gene_name, figsize=(10,10)):
     """
     Plots gene expression of a particular gene across 16um and 8um bins
     If no expression in a particular bin, the bin is transparent
@@ -124,7 +124,7 @@ def plot_gene_exp(sdata, id, gene_name):
         ).pl.show(
             coordinate_systems="global",
             title=f"bin_size={bin_size}µm",
-            figsize=(10, 10)
+            figsize=figsize
         )
 
 
