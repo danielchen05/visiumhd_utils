@@ -50,7 +50,7 @@ def compute_qc_metrics(sdata, bin_size = 2, mito_prefix="MT-"):
     return sdata
 
 
-def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vmax=None, save_path=None):
+def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vmax=None, save_path=None, figsize=(10, 10)):
     """
     Plot a single QC metric (e.g., total counts, % mito) at 2um resolution.
 
@@ -64,6 +64,7 @@ def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vm
     vmin: (optional) lower limit for color scale
     vmax: (optional) upper limit for color scale
     save_path: (optional) the path to save figure. If None (default), shows plot interactively.
+    figsize: tuple, optional. Figure size in inches (default: (10, 10))
     """
     from spatialdata_plot.pl.utils import set_zero_in_cmap_to_transparent
 
@@ -94,7 +95,7 @@ def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vm
     ).pl.show(
         coordinate_systems="global",
         title=f"{bin_size}um QC: {metric}",
-        figsize=(10, 10),
+        figsize=figsize,
         save=save_path
     )
 
