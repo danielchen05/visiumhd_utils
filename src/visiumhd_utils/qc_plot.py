@@ -50,7 +50,7 @@ def compute_qc_metrics(sdata, bin_size = 2, mito_prefix="MT-"):
     return sdata
 
 
-def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vmax=None, save_path=None, figsize=(10, 10)):
+def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vmax=None, save_path=None, figsize=(10, 10), title = None):
     """
     Plot a single QC metric (e.g., total counts, % mito) at 2um resolution.
 
@@ -94,7 +94,7 @@ def plot_qc_metrics(sdata, id, metric, bin_size=2, cmap="viridis", vmin=None, vm
         datashader_reduction = "max" # to preserve max of the data for colorscale
     ).pl.show(
         coordinate_systems="global",
-        title=f"{bin_size}um QC: {metric}",
+        title=title if title else f"{bin_size}um QC: {metric}",
         figsize=figsize,
         save=save_path
     )
